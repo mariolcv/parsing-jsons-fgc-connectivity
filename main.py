@@ -1,11 +1,11 @@
 import json
 from datetime import datetime
-
+from plots import plot_signal_time_station, faltenMatrix
 
 def loaders(): 
     # Ruta al archivo JSON
-    json_file_scheduler = 'C:/hack_uab/parsing-jsons-fgc-connectivity/schedule.json'
-    json_file_record = 'C:/hack_uab/parsing-jsons-fgc-connectivity/test.json'
+    json_file_scheduler = 'schedule.json'
+    json_file_record = 'test.json'
 
     # Cargar los datos del archivo JSON
     with open(json_file_scheduler) as file:
@@ -116,11 +116,22 @@ def __main__():
 
     t_inicio = get_first_station(scheduler, linea, sentido, origen, t_inicio)
     stations = get_stations(scheduler, origen, destino, sentido, linea, t_inicio)
-    
+    print(stations)
+
     
     times = get_times(scheduler, stations, sentido, linea, t_inicio)
+    
+    t_inicio = datetime.strptime(travel['data'][0]['time'], "%H:%M:%S").time()
     matrix = create_matrix(travel, times)
-    print(len(matrix))
+    print(len(matrix)) 
+    print(matrix)
+    print(len(stations))
+    
+    
+    signal_time_station = faltenMatrix(matrix=matrix, stations=stations, o_time=t_inicio)
+    print(signal_time_station)
+    plot_signal_time_station(signal_time_station)
+    
 
 if __name__ == "__main__":
     __main__()
