@@ -35,6 +35,24 @@ def get_first_station(scheduler, linea, sentido, origen, t_inicio):
 
     return nearest_time
 
+def get_arrival_time(scheduler, linea, sentido, estacion, t_inicio):
+     # seleccionar los "departure_time" de la linea y sentido seleccionados
+    arrival_times = []
+    for item in scheduler:
+        if item['route_short_name'] == linea and item['trip_headsign'] == sentido and item['stop_name'] == estacion:
+            try:
+                time = datetime.strptime(item['arrival_time'], "%H:%M:%S").time()
+                arrival_times.append(time)
+            except ValueError:
+                continue
+    # Convertir t_inicio a datetime para poder hacer la comparación
+    t_inicio = datetime.combine(datetime.today(), t_inicio)
+
+    # Calcular la hora más cercana
+    nearest_time = min(arrival_times, key=lambda x: abs(datetime.combine(datetime.today(), x) - t_inicio))
+
+    return nearest_time
+
 def get_stations(scheduler, origen, destino, sentido, linea, t_inicio):
     # seleccionar los valores únicos de "stop_name" de la linea y sentido seleccionados
     
@@ -49,6 +67,42 @@ def get_stations(scheduler, origen, destino, sentido, linea, t_inicio):
     stations = stations[stations.index(origen):stations.index(destino)+1]
     return stations
 
+def get_times(scheduler, stations, sentido, linea, t_inicio):
+    # crear lista de los segundos de diferencia entre las estaciones
+    times = []
+    departure_time_actual = t_inicio
+    for station in stations[1:]:
+        t_arrival_next = get_arrival_time(scheduler, linea, sentido, station, departure_time_actual)
+        t_arrival_next_datetime = datetime.combine(datetime.today(), t_arrival_next)
+        departure_time_actual_datetime = datetime.combine(datetime.today(), departure_time_actual)
+        trayecto_seconds = int((t_arrival_next_datetime - departure_time_actual_datetime).total_seconds())
+        times.append(trayecto_seconds)
+
+        t_salida = get_first_station(scheduler, linea, sentido, station, t_arrival_next)
+        t_datetime_salida = datetime.combine(datetime.today(), t_salida)
+        t_tren_parado = int((t_datetime_salida - t_arrival_next_datetime).total_seconds())
+        times.append(t_tren_parado)
+
+        departure_time_actual = t_arrival_next
+    
+    return times
+
+
+def create_matrix(travel, times):
+    matrix = [[]]
+    total_iter = 0
+    for i in range(len(times)):
+        if total_iter >= len(travel['data']):
+            break
+        matrix.append([])
+        for j in range(times[i]):
+            if total_iter >= len(travel['data']):
+                break
+            matrix[i].append(travel['data'][total_iter]['connection'])
+            total_iter += 1
+    return matrix
+
+
 def __main__():
     scheduler, travel = loaders()
 
@@ -62,8 +116,11 @@ def __main__():
 
     t_inicio = get_first_station(scheduler, linea, sentido, origen, t_inicio)
     stations = get_stations(scheduler, origen, destino, sentido, linea, t_inicio)
-    print(stations)
-
+    
+    
+    times = get_times(scheduler, stations, sentido, linea, t_inicio)
+    matrix = create_matrix(travel, times)
+    print(len(matrix))
 
 if __name__ == "__main__":
     __main__()
