@@ -4,8 +4,8 @@ from datetime import datetime
 
 def loaders(): 
     # Ruta al archivo JSON
-    json_file_scheduler = 'C:/hack_uab/parsing-jsons-fgc-connectivity/schedule.json'
-    json_file_record = 'C:/hack_uab/parsing-jsons-fgc-connectivity/test.json'
+    json_file_scheduler = 'schedule.json'
+    json_file_record = 'test.json'
 
     # Cargar los datos del archivo JSON
     with open(json_file_scheduler) as file:
