@@ -5,7 +5,7 @@ from plots import plot_signal_time_station, faltenMatrix
 def loaders(): 
     # Ruta al archivo JSON
     json_file_scheduler = 'schedule.json'
-    json_file_record = 'test.json'
+    json_file_record = '06:28:46.JSON'
 
     # Cargar los datos del archivo JSON
     with open(json_file_scheduler) as file:
@@ -108,7 +108,7 @@ def __main__():
 
      # asignar datos principales
     linea = travel['options']['linea']
-    sentido = travel['options']['final_linea']
+    sentido = travel['options']['direccion']
     origen = travel['options']['origen']
     destino = travel['options']['destino']
     t_inicio = datetime.strptime(travel['data'][0]['time'], "%H:%M:%S").time()

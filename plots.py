@@ -1,5 +1,6 @@
 from datetime import datetime, date, timedelta
 import matplotlib.pyplot as plt
+import numpy as np
 
 def add_second_to_time(t):
     # Combine date and time to create a datetime object
@@ -20,6 +21,9 @@ def faltenMatrix(matrix, stations, o_time):
             time = add_second_to_time(time)
 
     return signal_time_station
+
+
+
 
 
 def plot_signal_time_station(signal_time_station):
@@ -43,9 +47,15 @@ def plot_signal_time_station(signal_time_station):
     plt.ylabel('Signal Value')
     plt.title('Signal Value over Time')
     plt.xticks(rotation=45)
+
+    # Select one out of every ten ticks for display
+    x_ticks = np.arange(0, len(times), 10)
+    plt.xticks(x_ticks, [times[i] for i in x_ticks])
+
     plt.grid(True)
     plt.tight_layout()
     plt.show()
+
 
     
     
